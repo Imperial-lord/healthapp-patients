@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:healthapp/authentication/google_login.dart';
-import 'package:healthapp/screens/disease.dart';
 import 'package:healthapp/screens/drawer.dart';
-import 'package:healthapp/screens/index.dart';
 
 class HomeScreen extends StatefulWidget {
   static String id = 'home_screen';
@@ -12,26 +9,29 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // TODO show blogs in the homescreen in the form of cards
   int selectedIndex = 0;
 
   List<Widget> widgetOptions = [
-    //TODO appointments + payments along with+ cancel and reschedule button
-    
-    //TODO: chats with doctor
-    Disease(),
-    //TODO : video calling with doctor
     Container(
       color: Colors.white,
     ),
-    
-      IndexPage(),
-    
+    Container(
+      color: Colors.white,
+    ),
+    Container(
+      color: Colors.white,
+    ),
   ];
   List<Text> headingOptions = [
-    Text('Appointments'),
-    Text('Chats'),
-    Text('Video Call'),
+    Text(
+      'Home',
+    ),
+    Text(
+      'Appointments',
+    ),
+    Text(
+      'Blogs',
+    ),
   ];
 
   @override
@@ -40,27 +40,34 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Scaffold(
         appBar: PreferredSize(
           preferredSize:
-              Size.fromHeight(MediaQuery.of(context).size.height * 0.05),
+              Size.fromHeight(MediaQuery.of(context).size.height * 0.08),
           child: AppBar(
             title: headingOptions[selectedIndex],
-            backgroundColor: Colors.blue,
+            backgroundColor: Colors.blue[700],
           ),
         ),
         drawer: DrawerWidget(),
         body: widgetOptions[selectedIndex],
         bottomNavigationBar: BottomNavigationBar(
+          selectedItemColor: Colors.blue[700],
           items: [
             BottomNavigationBarItem(
-              icon: Icon(Icons.accessibility),
-              title: Text('Appointments'),
+              icon: Icon(Icons.home),
+              title: Text(
+                'Home',
+              ),
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.change_history),
-              title: Text('Chats'),
+              icon: Icon(Icons.work),
+              title: Text(
+                'Appointments',
+              ),
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.video_call),
-              title: Text('Video Call'),
+              icon: Icon(Icons.chat_bubble),
+              title: Text(
+                'Blogs',
+              ),
             ),
           ],
           currentIndex: selectedIndex,

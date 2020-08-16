@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:healthapp/authentication/google_login.dart';
-import 'home_screen.dart';
+import 'package:healthapp/screens/mobile_auth_screens/mobile_login_page.dart';
 import 'package:healthapp/authentication/facebook_login.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -131,6 +131,11 @@ class _LoginPageState extends State<LoginPage> {
     return RaisedButton(
       splashColor: Colors.grey,
       onPressed: () {
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (context){
+            return MobileLoginPage();
+          }
+        ));
         //TODO: Implement Mobile Phone Login
         print('Implement Mobile Phone Login');
       },
@@ -163,7 +168,7 @@ class _LoginPageState extends State<LoginPage> {
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (context) {
-                  return HomeScreen();
+                  return MobileLoginPage();
                 },
               ),
             );
@@ -175,7 +180,7 @@ class _LoginPageState extends State<LoginPage> {
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (context) {
-                  return HomeScreen();
+                  return MobileLoginPage();
                 },
               ),
             );
