@@ -1,5 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
+String testimonial =
+    'Its indeed a pleasure and my sincere thanks to the doctor for controlling my sugar while I had visited almost all doctors. '
+    'But in my first visit to the doctor I saw a dedicated approach and I was explained that my technique of taking insulin was not correct and a few modifications of the dose.'
+    'I am now following his technique & the dose with this my sugars are well under control.';
+String signature = 'Mr. Ragi Reddy (Entrepreneur)';
 
 class HomePage extends StatefulWidget {
   @override
@@ -20,23 +28,173 @@ class _HomePageState extends State<HomePage> {
             children: <Widget>[
               _topPoster(),
               _bookAppointmentButton(),
-              Container(
-                alignment: Alignment.centerLeft,
-                padding: const EdgeInsets.only(bottom: 10),
-                child: Text(
-                  'Medical services we offer',
-                  style: TextStyle(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 15,
-                      color: Color(0xFF08134D)),
-                ),
-              ),
-              MyStatefulWidget(),
+              _textTitle('Medical services we offer'),
+              MyAccordionWidget(),
+              _textTitle('COVID Information Videos'),
+              _showVideos(),
+              _textTitle('Articles'),
+              _showArticles(),
+              _textTitle('Testimonials'),
+              _showTestimonials(),
             ],
           ),
         ),
       ),
     );
+  }
+
+  Widget _textTitle(String title) {
+    return Container(
+      alignment: Alignment.centerLeft,
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Text(
+        title,
+        style: TextStyle(
+            fontWeight: FontWeight.w700,
+            fontSize: 15,
+            color: Color(0xFF08134D)),
+      ),
+    );
+  }
+
+  Widget _showTestimonials() {
+    return Container(
+      height: 200,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        children: <Widget>[
+          _testimonialContainer(testimonial, signature),
+          _testimonialContainer(testimonial, signature),
+          _testimonialContainer(testimonial, signature),
+          _testimonialContainer(testimonial, signature),
+        ],
+      ),
+    );
+  }
+
+  Widget _testimonialContainer(String t, String s) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 30, bottom: 10),
+      child: Container(
+        width: 450,
+        child: RaisedButton(
+          onPressed: () {
+            print('Pressed!');
+          },
+          highlightElevation: 20,
+          color: Colors.white,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              FaIcon(
+                FontAwesomeIcons.quoteLeft,
+                color: Colors.blue[700],
+              ),
+              Container(
+                  padding: EdgeInsets.all(5), child: Flexible(child: Text(t,style: TextStyle(color: Color(0xFF8F8F8F)),))),
+              Container(
+                padding: EdgeInsets.only(left: 5),
+                child: Text('-'+s,style: TextStyle(color:Color(0xFF08134D)),),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _showArticles() {
+    return Container(
+      height: 200,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        children: <Widget>[
+          _articleContainer('https://dramitendo.com/an-overview-of-diabetes/',
+              'https://dramitendo.com/wp-content/uploads/2020/07/diabetes.jpg'),
+          _articleContainer(
+              'https://dramitendo.com/precautions-for-thyroid-patients-dos-donts/',
+              'https://dramitendo.com/wp-content/uploads/2020/07/thyroid.jpg'),
+          _articleContainer(
+              'https://dramitendo.com/what-you-should-know-about-hormones/',
+              'https://dramitendo.com/wp-content/uploads/2020/07/dna.jpg'),
+        ],
+      ),
+    );
+  }
+
+  Widget _articleContainer(String url, String imgUrl) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0, 0, 30, 10),
+      child: InkWell(
+        onTap: () {
+          _launchURL(url);
+        },
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(7),
+          child: Image(
+            image: NetworkImage(imgUrl),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _showVideos() {
+    return Container(
+      height: 200,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        children: <Widget>[
+          _videoContainer('https://www.youtube.com/watch?v=Kf3Pz2aoIXE'),
+          _videoContainer('https://www.youtube.com/watch?v=JfpECBWjMlo'),
+          _videoContainer('https://www.youtube.com/watch?v=1vfrFSzFgo4'),
+          _videoContainer('https://www.youtube.com/watch?v=AauNs2GIT7A'),
+          _videoContainer('https://www.youtube.com/watch?v=03o1yjAq_2M'),
+          _videoContainer('https://www.youtube.com/watch?v=YS_T3I1ps1w'),
+        ],
+      ),
+    );
+  }
+
+  Widget _videoContainer(String url) {
+    String video_id = url.split("=")[1];
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0, 0, 30, 10),
+      child: InkWell(
+        onTap: () {
+          _launchURL(url);
+        },
+        child: Container(
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(7)),
+          child: Stack(
+            alignment: Alignment.center,
+            children: <Widget>[
+              ClipRRect(
+                borderRadius: BorderRadius.circular(7),
+                child: Image(
+                  image: NetworkImage('https://img.youtube.com/vi/' +
+                      video_id +
+                      '/sddefault.jpg'),
+                ),
+              ),
+              FaIcon(
+                FontAwesomeIcons.youtube,
+                color: Colors.red,
+                size: 40,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  _launchURL(url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
   }
 
   Widget _bookAppointmentButton() {
@@ -186,14 +344,14 @@ List<Item> generateItems(int numberOfItems) {
   });
 }
 
-class MyStatefulWidget extends StatefulWidget {
-  MyStatefulWidget({Key key}) : super(key: key);
+class MyAccordionWidget extends StatefulWidget {
+  MyAccordionWidget({Key key}) : super(key: key);
 
   @override
-  _MyStatefulWidgetState createState() => _MyStatefulWidgetState();
+  _MyAccordionWidgetState createState() => _MyAccordionWidgetState();
 }
 
-class _MyStatefulWidgetState extends State<MyStatefulWidget> {
+class _MyAccordionWidgetState extends State<MyAccordionWidget> {
   List<Item> _data = generateItems(6);
 
   @override
