@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:healthapp/screens/appointment_page.dart';
 import 'package:healthapp/screens/drawer.dart';
-import 'package:healthapp/screens/home_page.dart';
+import 'package:healthapp/screens/home/home_page.dart';
 import 'package:healthapp/screens/mobile_auth_screens/otp_page.dart';
 
 class HomeScreen extends StatefulWidget {
