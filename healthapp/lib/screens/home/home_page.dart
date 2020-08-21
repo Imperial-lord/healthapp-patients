@@ -16,6 +16,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Material(
+      color: Color(0xFFF8F8F8),
       child: Container(
         color: Color(0xFFF8F8F8),
         margin: EdgeInsets.symmetric(horizontal: 10),

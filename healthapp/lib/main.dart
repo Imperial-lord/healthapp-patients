@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:healthapp/screens/appointments/appointments_page.dart';
+import 'package:healthapp/screens/blogs/blogs_page.dart';
 import 'package:healthapp/screens/login_screen.dart';
 import 'package:healthapp/screens/home_screen.dart';
 import 'package:healthapp/screens/user_details.dart';
@@ -35,11 +37,13 @@ class _MyAppState extends State<MyApp> {
           ),
           home: SplashPage(),
           routes: {
-            LoginPage.id: (context) =>LoginPage(),
+            LoginPage.id: (context) => LoginPage(),
             UserForm.id: (context) => UserForm(),
             LoginPage.id: (context) => LoginPage(),
             HomeScreen.id: (context) => HomeScreen(),
             Profile.id: (context) => Profile(),
+            AppointmentPage.id: (context) => AppointmentPage(),
+            BlogsPage.id: (context) => BlogsPage(),
           }),
     );
   }
