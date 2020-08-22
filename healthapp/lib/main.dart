@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:healthapp/screens/appointments/appointments_page.dart';
 import 'package:healthapp/screens/blogs/blogs_page.dart';
+import 'package:healthapp/screens/book_appointments/doctor_details.dart';
+import 'package:healthapp/screens/book_appointments/doctors_list.dart';
 import 'package:healthapp/screens/login_screen.dart';
 import 'package:healthapp/screens/home_screen.dart';
 import 'package:healthapp/screens/user_details.dart';
@@ -27,24 +29,27 @@ class _MyAppState extends State<MyApp> {
         )
       ],
       child: MaterialApp(
-          debugShowCheckedModeBanner: false,
-          title: 'AG Hospital',
-          theme: ThemeData(
-            primarySwatch: Colors.blue,
-            textTheme: GoogleFonts.varelaRoundTextTheme(
-              Theme.of(context).textTheme,
-            ),
+        debugShowCheckedModeBanner: false,
+        title: 'AG Hospital',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          textTheme: GoogleFonts.varelaRoundTextTheme(
+            Theme.of(context).textTheme,
           ),
-          home: SplashPage(),
-          routes: {
-            LoginPage.id: (context) => LoginPage(),
-            UserForm.id: (context) => UserForm(),
-            LoginPage.id: (context) => LoginPage(),
-            HomeScreen.id: (context) => HomeScreen(),
-            Profile.id: (context) => Profile(),
-            AppointmentPage.id: (context) => AppointmentPage(),
-            BlogsPage.id: (context) => BlogsPage(),
-          }),
+        ),
+        home: SplashPage(),
+        routes: {
+          LoginPage.id: (context) => LoginPage(),
+          UserForm.id: (context) => UserForm(),
+          LoginPage.id: (context) => LoginPage(),
+          HomeScreen.id: (context) => HomeScreen(),
+          Profile.id: (context) => Profile(),
+          AppointmentPage.id: (context) => AppointmentPage(),
+          BlogsPage.id: (context) => BlogsPage(),
+          DoctorsList.id: (context) => DoctorsList(),
+          DoctorDetails.id: (context) => DoctorDetails(),
+        },
+      ),
     );
   }
 }

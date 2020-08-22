@@ -282,6 +282,13 @@
             </list>
           </value>
         </entry>
+        <entry key="flutter_rating_bar">
+          <value>
+            <list>
+              <option value="$PROJECT_DIR$/../snap/flutter/common/flutter/.pub-cache/hosted/pub.dartlang.org/flutter_rating_bar-3.0.1+1/lib" />
+            </list>
+          </value>
+        </entry>
         <entry key="flutter_test">
           <value>
             <list>
@@ -765,6 +772,7 @@
       <root url="file://$PROJECT_DIR$/../snap/flutter/common/flutter/.pub-cache/hosted/pub.dartlang.org/fixnum-0.10.11/lib" />
       <root url="file://$PROJECT_DIR$/../snap/flutter/common/flutter/.pub-cache/hosted/pub.dartlang.org/flutter_facebook_login-1.2.0/lib" />
       <root url="file://$PROJECT_DIR$/../snap/flutter/common/flutter/.pub-cache/hosted/pub.dartlang.org/flutter_mobx-1.1.0+2/lib" />
+      <root url="file://$PROJECT_DIR$/../snap/flutter/common/flutter/.pub-cache/hosted/pub.dartlang.org/flutter_rating_bar-3.0.1+1/lib" />
       <root url="file://$PROJECT_DIR$/../snap/flutter/common/flutter/.pub-cache/hosted/pub.dartlang.org/flutter_web_browser-0.11.0/lib" />
       <root url="file://$PROJECT_DIR$/../snap/flutter/common/flutter/.pub-cache/hosted/pub.dartlang.org/font_awesome_flutter-8.8.1/lib" />
       <root url="file://$PROJECT_DIR$/../snap/flutter/common/flutter/.pub-cache/hosted/pub.dartlang.org/glob-1.2.0/lib" />
