@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:healthapp/screens/book_appointments/doctor_details.dart';
 import 'package:healthapp/widgets/app_bar.dart';
+import 'package:healthapp/authentication/user.dart';
 
 const List<String> doc_names = ['Dr. Amit Goel', 'Dr Sonali Gupta'];
 const List<String> doc_images = ['doc1', 'doc2'];
@@ -47,12 +48,19 @@ class _DoctorsListState extends State<DoctorsList> {
 
   Widget _doctorTile(String name, String imgUrl, String fields, String expYears,
       String costs) {
+    String id;
     return Padding(
       padding: const EdgeInsets.only(bottom: 20),
       child: RaisedButton(
-        onPressed: () {
-          print('Pay me my fees quick!');
-          Navigator.pushNamed(context, DoctorDetails.id);
+        onPressed: () async {
+          print(name);
+       
+          Navigator.pushNamed(context, DoctorDetails.id,arguments: {
+            'name': name,
+            'expYears': expYears,
+            'fields': fields,
+            'costs': costs,
+          });
         },
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(7)),
         color: Colors.white,

@@ -1,12 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:healthapp/authentication/google_login.dart';
 import 'package:healthapp/authentication/facebook_login.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:healthapp/screens/appointments/appointments_page.dart';
-import 'profile.dart';
+import 'edit_profile.dart';
 import 'login_screen.dart';
 import "package:provider/provider.dart";
 import 'package:healthapp/stores/login_store.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DrawerWidget extends StatefulWidget {
   const DrawerWidget({Key key}) : super(key: key);
@@ -18,151 +21,225 @@ class DrawerWidget extends StatefulWidget {
 String type;
 
 class _DrawerWidgetState extends State<DrawerWidget> {
+  Future<Null> handleSignOut() async {
+    this.setState(() {
+      isLoading = true;
+    });
+
+    await FirebaseAuth.instance.signOut();
+    await googleSignIn.disconnect();
+    await googleSignIn.signOut();
+
+    this.setState(() {
+      isLoading = false;
+    });
+
+    Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => LoginPage()),
+        (Route<dynamic> route) => false);
+  }
+
+  SharedPreferences prefs;
+
+  String name;
+  String email;
+  String photo;
+
+  void readLocal() async {
+    prefs = await SharedPreferences.getInstance();
+
+    name = prefs.getString('name') ?? '';
+    email = prefs.getString('email') ?? '';
+    photo = prefs.getString('photoUrl') ?? '';
+
+    email = email.split('@')[0];
+    // Force refresh input
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    readLocal();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    String name = f_name, email = f_email, imageUrl = f_imageUrl;
-    if (type == 'Google') {
-      name = g_name;
-      email = g_email;
-      imageUrl = g_imageUrl;
-    }
-    if (email != null) email = email.split("@")[0];
     return Consumer<LoginStore>(builder: (_, loginStore, __) {
       return Drawer(
         child: Container(
-          color: Colors.black87,
+          color: Colors.white,
           child: ListView(
             children: [
               //TODO :Make this dynamic later!
-              Container(
-                color: Colors.blue[700],
-                padding: EdgeInsets.only(top: 20, bottom: 20),
-                child: Row(
-                  children: <Widget>[
-                    Padding(
-                      padding: EdgeInsets.all(10),
-                      child: CircleAvatar(
-                        child: ClipOval(
-                          child: Image.network(
-                            (imageUrl != null)
-                                ? imageUrl
-                                : 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=80',
+              InkWell(
+                onTap: () {
+                  Navigator.pushNamed(context, Profile.id);
+                },
+                child: Container(
+                  color: Colors.blue[700],
+                  padding: EdgeInsets.symmetric(vertical: 20),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.all(10),
+                        child: CircleAvatar(
+                          child: ClipOval(
+                            child: Image.network(
+                              (photo != null)
+                                  ? (photo.substring(0, photo.length - 5) +
+                                      's400-c')
+                                  : 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=80',
+                            ),
                           ),
+                          radius: 30,
+                          backgroundColor: Colors.transparent,
                         ),
-                        radius: 50,
-                        backgroundColor: Colors.transparent,
                       ),
-                    ),
-                    Column(
-                      children: <Widget>[
-                        Container(
-                          child: Center(
-                            child: Text(
+                      Padding(
+                        padding: EdgeInsets.only(left: 10),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text(
                               (name != null) ? '$name' : 'Kate Williams',
                               style: TextStyle(
-                                fontSize: 20.0,
-                                fontWeight: FontWeight.w400,
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.w700,
                                 color: Colors.white,
                               ),
                             ),
-                          ),
-                        ),
-                        Container(
-                          padding: EdgeInsets.symmetric(vertical: 5.0),
-                          child: Center(
-                            child: Text(
-                              (email != null)
-                                  ? '$email \n@gmail.com'
-                                  : 'katewilliams01 \n @gmail.com',
+                            Text(
+                              (email != null) ? '$email' : 'katewilliams01',
                               style: TextStyle(
-                                fontSize: 15.0,
-                                fontWeight: FontWeight.w400,
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.w500,
                                 color: Colors.white,
                               ),
                             ),
-                          ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              ListTileWidget(
-                text: 'My Appointments',
-                icon: Icon(
-                  Icons.work,
-                  color: Colors.white,
-                ),
-                onTap: () {Navigator.pushNamed(context, AppointmentPage.id);},
-              ),
-              ListTileWidget(
-                text: 'My prescriptions',
-                icon: Icon(
-                  Icons.assignment,
-                  color: Colors.white,
-                ),
-                onTap: () {
-
-                },
-              ),
-              ListTileWidget(
-                text: 'My payments',
-                icon: Icon(
-                  Icons.payment,
-                  color: Colors.white,
-                ),
-                onTap: () {},
-              ),
-              ListTileWidget(
-                text: 'Edit Profile',
-                icon: Icon(
-                  Icons.edit,
-                  color: Colors.white,
-                ),
-                onTap: () {
-                  Navigator.pushNamed(context, Profile.id);
-                },
-              ),
-              Divider(
-                thickness: 1,
-                color: Colors.white,
-              ),
-              ListTileWidget(
-                text: 'Support',
-                icon: Icon(
-                  Icons.headset_mic,
-                  color: Colors.white,
-                ),
-                onTap: () {},
-              ),
-              ListTileWidget(
-                text: 'Terms of Use',
-                icon: Icon(
-                  Icons.speaker_notes,
-                  color: Colors.white,
-                ),
-                onTap: () {
-                  Navigator.pushNamed(context, Profile.id);
-                },
               ),
               Padding(
-                padding: EdgeInsets.symmetric(vertical: 40),
-                child: ListTileWidget(
-                  text: 'Signout',
-                  icon: Icon(
-                    Icons.arrow_back_ios,
-                    color: Colors.white,
+                padding: EdgeInsets.symmetric(vertical: 10),
+              ),
+              ListTile(
+                dense: true,
+                title: Text(
+                  'My appointments',
+                  style: TextStyle(
+                      color: Color(0xFF8F8F8F),
+                      fontWeight: FontWeight.w600,
+                      fontSize: 18),
+                ),
+                leading: Icon(
+                  Icons.work,
+                  color: Color(0xFF408AEB),
+                ),
+                onTap: () {
+                  Navigator.pushNamed(context, AppointmentPage.id);
+                },
+              ),
+              ListTile(
+                dense: true,
+                title: Text(
+                  'Blogs',
+                  style: TextStyle(
+                      color: Color(0xFF8F8F8F),
+                      fontWeight: FontWeight.w600,
+                      fontSize: 18),
+                ),
+                leading: Icon(
+                  Icons.edit,
+                  color: Color(0xFF408AEB),
+                ),
+                onTap: () {},
+              ),
+              ListTile(
+                dense: true,
+                title: Text(
+                  'Refer a friend',
+                  style: TextStyle(
+                      color: Color(0xFF8F8F8F),
+                      fontWeight: FontWeight.w600,
+                      fontSize: 18),
+                ),
+                leading: Icon(
+                  Icons.group,
+                  color: Color(0xFF408AEB),
+                ),
+                onTap: () {},
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                child: Divider(
+                  thickness: 1,
+                  color: Color(0x4F8F8F8F),
+                  indent: 20,
+                  endIndent: 20,
+                ),
+              ),
+              Container(
+                  margin: EdgeInsets.only(left: 20),
+                  padding: EdgeInsets.only(bottom: 20),
+                  child: Text(
+                    'Others',
+                    style: TextStyle(
+                        color: Color(0xFF262626),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18),
+                  )),
+              ListTile(
+                dense: true,
+                title: Text(
+                  'Support',
+                  style: TextStyle(
+                      color: Color(0xFF8F8F8F),
+                      fontWeight: FontWeight.w600,
+                      fontSize: 18),
+                ),
+                leading: Icon(
+                  Icons.headset_mic,
+                  color: Color(0xFF408AEB),
+                ),
+                onTap: () {},
+              ),
+              ListTile(
+                dense: true,
+                title: Text(
+                  'Terms of Use',
+                  style: TextStyle(
+                      color: Color(0xFF8F8F8F),
+                      fontWeight: FontWeight.w600,
+                      fontSize: 18),
+                ),
+                leading: Icon(
+                  Icons.speaker_notes,
+                  color: Color(0xFF408AEB),
+                ),
+                onTap: () {},
+              ),
+              Padding(
+                padding: EdgeInsets.only(top: 100),
+                child: ListTile(
+                  title: Text(
+                    'Logout',
+                    style: TextStyle(
+                        color: Color(0xFF8F8F8F),
+                        fontWeight: FontWeight.w600,
+                        fontSize: 18),
+                  ),
+                  leading: FaIcon(
+                    FontAwesomeIcons.arrowCircleLeft,
+                    color: Color(0xFF408AEB),
                   ),
                   onTap: () {
-                    loginStore.signOut(context);
-                    if (type == 'Google')
-                      signOutGoogle();
-                    else
-                      signOutFacebook();
-                    Navigator.of(context).pushAndRemoveUntil(
-                        MaterialPageRoute(builder: (context) {
-                      return LoginPage();
-                    }), ModalRoute.withName('/'));
+                    handleSignOut();
                   },
                 ),
               ),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:healthapp/screens/book_appointments/appointment_details.dart';
+import 'package:healthapp/authentication/user.dart' as globals;
 
 class DoctorDetails extends StatefulWidget {
   @override
@@ -14,6 +15,18 @@ class DoctorDetails extends StatefulWidget {
 class _DoctorDetailsState extends State<DoctorDetails> {
   @override
   Widget build(BuildContext context) {
+    String name, expYears, fields, costs;
+    final Map arguments = ModalRoute.of(context).settings.arguments as Map;
+    if (arguments != null) {
+      name = arguments['name'];
+      expYears = arguments['expYears'];
+      fields = arguments['fields'];
+      costs = arguments['costs'];
+      print(name);
+    }
+
+    globals.user.cost = int.parse(costs.substring(3));
+
     return Scaffold(
       appBar: _appBar(),
       body: Stack(
@@ -34,10 +47,10 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                           _textTitle(
                               'About', Color(0xFF08134D), 15, FontWeight.w700),
                           _descText(
-                              'Dr. M. R. Pujari is highly qualified and highly experienced doctor'
-                              ' with 13 years of vast experience. Working as a chief consultant in various'
-                              ' dental clinics, cosmetic dentist, root canal specialist, TMJ and oral medicine'
-                              ' specialist.',
+                              'Dr Amit Goel has a decade of experience in the field of medicine with '
+                              'an experience as an Endocrinologist for over 4 years. Dr Amit’s published '
+                              'articles are one of the best in the world for research on prevention and early '
+                              'detection of diabetic neuropathy.',
                               Color(0xFF8F8F8F)),
                           _textTitle('Reviews', Color(0xFF08134D), 15,
                               FontWeight.w700),
@@ -82,8 +95,13 @@ class _DoctorDetailsState extends State<DoctorDetails> {
             child: RaisedButton(
               elevation: 10,
               onPressed: () {
-                Navigator.pushNamed(context, AppointmentDetails.id);
-                print('Redirect to appointment details!');
+                //  print(name);
+                Navigator.pushNamed(context, AppointmentDetails.id, arguments: {
+                  'name': name,
+                  'expYears': expYears,
+                  'fields': fields,
+                  'costs': costs,
+                });
               },
               color: Color(0xFF408AEB),
               shape: RoundedRectangleBorder(
