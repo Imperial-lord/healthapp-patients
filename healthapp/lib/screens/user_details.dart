@@ -112,6 +112,7 @@ List<Color> _bodyColor = [
 ];
 List<String> _category = ['Male', 'Female', 'Other'];
 DateTime selectedDate = DateTime.now();
+String dropdownValue = 'O+';
 
 // Widget for getting , validating and storing User Address
 class UserForm extends StatefulWidget {
@@ -249,15 +250,35 @@ class _UserFormState extends State<UserForm> {
             padding: const EdgeInsets.symmetric(vertical: 10),
             child: Text('Blood Group', style: textStyle1),
           ),
-          TextFormField(
-              decoration: inputDecoration,
-              cursorColor: Color(0xFF8F8F8F),
-              cursorRadius: Radius.circular(10),
-              cursorWidth: 0.5,
-              style: textStyle2,
-              onSaved: (String value) {
-                blood = value;
-              }),
+          Container(
+            padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+            decoration: BoxDecoration(
+                color: Colors.white, borderRadius: BorderRadius.circular(7)),
+            child: DropdownButton<String>(
+              value: dropdownValue,
+              icon: Icon(Icons.arrow_drop_down),
+              iconSize: 24,
+              isExpanded: true,
+              underline: SizedBox(),
+              style: TextStyle(
+                  color: Color(0xFF408AEB),
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500),
+              onChanged: (String newValue) {
+                setState(() {
+                  dropdownValue = newValue;
+                  blood=dropdownValue;
+                });
+              },
+              items: <String>['O+', 'O-', 'AB+', 'AB-', 'A+', 'A-', 'B+', 'B-']
+                  .map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+            ),
+          ),
         ],
       ),
     );
@@ -572,8 +593,15 @@ class _UserFormState extends State<UserForm> {
                           // If the form is valid , all the values are saved in respective variables
                           _formKey.currentState.save();
 
-                          print(name); print(email); print(gender); print(address); print(dob);
-                          print(blood); print(height); print(weight); print(marital);
+                          print(name);
+                          print(email);
+                          print(gender);
+                          print(address);
+                          print(dob);
+                          print(blood);
+                          print(height);
+                          print(weight);
+                          print(marital);
 
                           final doc = await Firestore.instance
                               .collection('user_details')
