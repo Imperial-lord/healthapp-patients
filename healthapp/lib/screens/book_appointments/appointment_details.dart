@@ -2,12 +2,15 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+//import 'package:googleapis/bigquery/v2.dart';
 import 'package:healthapp/widgets/app_bar.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:healthapp/authentication/user.dart' as globals;
 import 'package:toast/toast.dart';
 import 'package:healthapp/paymentSuccess.dart';
 import 'package:healthapp/paymentFailed.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 List<Color> _textColor = [
   Color(0xFF8F8F8F),
@@ -84,11 +87,38 @@ class AppointmentDetails extends StatefulWidget {
   _AppointmentDetailsState createState() => _AppointmentDetailsState();
 }
 
+String type;
+String gender, dob, blood, marital, address, name, email;
+String height, weight, photo;
+
+String id;
+SharedPreferences prefs;
+
 class _AppointmentDetailsState extends State<AppointmentDetails> {
   Razorpay razorpay;
 
+  void readLocal() async {
+    prefs = await SharedPreferences.getInstance();
+    name = prefs.getString('name') ?? globals.user.name;
+    email = prefs.getString('email') ?? globals.user.email;
+    photo = prefs.getString('photo') ?? globals.user.photo;
+    gender = prefs.getString('gender') ?? globals.user.gender;
+    dob = prefs.getString('dob') ?? globals.user.dob;
+    blood = prefs.getString('blood') ?? globals.user.blood;
+    height = prefs.getString('height') ?? globals.user.height;
+    weight = prefs.getString('dob') ?? globals.user.weight;
+    marital = prefs.getString('marital') ?? globals.user.marital;
+    address = prefs.getString('address') ?? globals.user.address;
+
+    email = email.split('@')[0];
+
+    // Force refresh input
+    setState(() {});
+  }
+
   @override
   void initState() {
+    readLocal();
     super.initState();
 
     razorpay = new Razorpay();
@@ -105,15 +135,58 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
     razorpay.clear();
   }
 
+  Map<String, String> notes = new Map();
+
   void openCheckout() {
+    String date = selectedDate.toString();
+    date = date.substring(0, 10);
+    globals.user.date = date;
+    globals.user.visitDuration = visitDuration;
+
+    globals.user.visitTime = visitTime;
+
+    globals.user.visitType = visitType;
+
     var options = {
       "key": "rzp_test_7ygVzTh2b1Y9df",
       "amount": (globals.user.cost) * 100,
-      "name": "Sample App",
-      "description": "Payment for the some random product",
-      "prefill": {"contact": "", "email": ""},
+      "name": "Dr Amit Goel Clinic",
+
+      //                         visitTime: visitTime,
+      //                         visitType: visitType,
+      //                         visitDuration: visitDuration,
+
+      // 'timeout': 60, // in seconds
+//TODO:send these details
+      "notes": {
+        //  "Age":"20",
+        "Name": name,
+        "Gender": gender,
+        //TODO: add a field why is he visiting when he is booking the payment
+        "Reason to visit": "Cough and Cold",
+        //TODO: add this variable
+
+        "First time/Follow up": "First Time",
+
+        "Date of Birth": dob,
+        "Blood Group": blood,
+        "Height": height,
+        "Weight": weight,
+        "Marital Status": marital,
+        "Home Address": address,
+      },
+      //"theme": "#FFFFFF",
+      "description": "$visitType, $date, $visitDuration($visitTime)",
+      "image":
+          "https://dramitendo.com/wp-content/uploads/2020/07/Dr-Amit-Goel.png",
+      "prefill": {
+        "contact": "",
+        "email": "",
+      },
+      "currency": "INR",
+      "payment_capture": 1,
       "external": {
-        "wallets": ["paytm"]
+        "wallets": ["paytm", "phonepe", "gpay"]
       }
     };
 
@@ -125,10 +198,12 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
   }
 
   void handlerPaymentSuccess(PaymentSuccessResponse response) {
-  //  print(response.paymentId);
+    print('paymentid');
+    print(response.paymentId);
     globals.user.paymentId = response.paymentId;
     print("Payment success");
     Toast.show("Payment success", context);
+    globals.getPatientofGivenBookingId(response.paymentId);
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(
@@ -142,7 +217,6 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
   }
 
   void handlerErrorFailure(PaymentFailureResponse response) {
-
     print("Payment error");
     Toast.show("Payment error", context);
     Navigator.pushAndRemoveUntil(
@@ -165,8 +239,7 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
 
   @override
   Widget build(BuildContext context) {
-   // PaymentSuccessResponse response;
-   
+    // PaymentSuccessResponse response;
 
     print(globals.user.cost);
     String name, expYears, fields, costs;
@@ -305,8 +378,13 @@ class _AppointmentDetailsState extends State<AppointmentDetails> {
                               visitTime: visitTime,
                               visitType: visitType,
                               visitDuration: visitDuration,
-                              paymentId: globals.user.paymentId,
+                              email: globals.user.email,
+                              id: globals.user.id,
+                              photo: globals.user.photo,
+                              name: globals.user.name,
                             );
+                            print('done');
+                            globals.getAllPatientDetail();
                             openCheckout();
                           },
                         ),

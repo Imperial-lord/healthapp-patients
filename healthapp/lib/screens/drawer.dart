@@ -1,15 +1,20 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:healthapp/authentication/google_login.dart';
-import 'package:healthapp/authentication/facebook_login.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:healthapp/screens/appointments/appointments_page.dart';
-import 'edit_profile.dart';
+import 'package:healthapp/screens/appointments/upcoming_page.dart';
+import 'package:healthapp/screens/blogs/blogs_page.dart';
+import 'package:healthapp/screens/chat_screen.dart';
+import 'package:healthapp/screens/user_profile.dart';
 import 'login_screen.dart';
 import "package:provider/provider.dart";
 import 'package:healthapp/stores/login_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:healthapp/authentication/user.dart' as globals;
+import 'package:healthapp/screens/edit_profile.dart';
+import 'package:share/share.dart';
 
 class DrawerWidget extends StatefulWidget {
   const DrawerWidget({Key key}) : super(key: key);
@@ -17,8 +22,6 @@ class DrawerWidget extends StatefulWidget {
   @override
   _DrawerWidgetState createState() => _DrawerWidgetState();
 }
-
-String type;
 
 class _DrawerWidgetState extends State<DrawerWidget> {
   Future<Null> handleSignOut() async {
@@ -48,10 +51,9 @@ class _DrawerWidgetState extends State<DrawerWidget> {
   void readLocal() async {
     prefs = await SharedPreferences.getInstance();
 
-    name = prefs.getString('name') ?? '';
-    email = prefs.getString('email') ?? '';
-    photo = prefs.getString('photoUrl') ?? '';
-
+    name = prefs.getString('name') ?? globals.user.name;
+    email = prefs.getString('email') ?? globals.user.email;
+    photo = prefs.getString('photo') ?? globals.user.photo;
     email = email.split('@')[0];
     // Force refresh input
     setState(() {});
@@ -65,6 +67,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
 
   @override
   Widget build(BuildContext context) {
+    // getPatient();
     return Consumer<LoginStore>(builder: (_, loginStore, __) {
       return Drawer(
         child: Container(
@@ -74,7 +77,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
               //TODO :Make this dynamic later!
               InkWell(
                 onTap: () {
-                  Navigator.pushNamed(context, Profile.id);
+                  Navigator.pushNamed(context, UserProfile.id);
                 },
                 child: Container(
                   color: Colors.blue[700],
@@ -87,13 +90,13 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                         child: CircleAvatar(
                           child: ClipOval(
                             child: Image.network(
-                              (photo != null)
-                                  ? (photo.substring(0, photo.length - 5) +
-                                      's400-c')
-                                  : 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=80',
+                              (photo != null) ? photo : globals.user.photo,
+                              height: 130,
+                              width: 130,
+                              fit: BoxFit.cover,
                             ),
                           ),
-                          radius: 30,
+                          radius: 40,
                           backgroundColor: Colors.transparent,
                         ),
                       ),
@@ -111,7 +114,9 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                               ),
                             ),
                             Text(
-                              (email != null) ? '$email' : 'katewilliams01',
+                              (email != null)
+                                  ? '${email.split('@')[0]}'
+                                  : 'katewilliams01',
                               style: TextStyle(
                                 fontSize: 16.0,
                                 fontWeight: FontWeight.w500,
@@ -142,7 +147,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                   color: Color(0xFF408AEB),
                 ),
                 onTap: () {
-                  Navigator.pushNamed(context, AppointmentPage.id);
+                  Navigator.pushNamed(context, ChatScreen.id);
                 },
               ),
               ListTile(
@@ -158,7 +163,9 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                   Icons.edit,
                   color: Color(0xFF408AEB),
                 ),
-                onTap: () {},
+                onTap: () {
+                  Navigator.pushNamed(context, BlogsPage.id);
+                },
               ),
               ListTile(
                 dense: true,
@@ -173,7 +180,11 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                   Icons.group,
                   color: Color(0xFF408AEB),
                 ),
-                onTap: () {},
+                onTap: () {
+                  Share.share(
+                      'Visit my website https://medicaregalaxy.vercel.app/',
+                      subject: 'Install this app Now!');
+                },
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 20),
@@ -197,7 +208,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
               ListTile(
                 dense: true,
                 title: Text(
-                  'Support',
+                  'Contact Us',
                   style: TextStyle(
                       color: Color(0xFF8F8F8F),
                       fontWeight: FontWeight.w600,
@@ -212,7 +223,23 @@ class _DrawerWidgetState extends State<DrawerWidget> {
               ListTile(
                 dense: true,
                 title: Text(
-                  'Terms of Use',
+                  'About us',
+                  style: TextStyle(
+                      color: Color(0xFF8F8F8F),
+                      fontWeight: FontWeight.w600,
+                      fontSize: 18),
+                ),
+                leading: Icon(
+                  Icons.work,
+                  color: Color(0xFF408AEB),
+                ),
+                onTap: () {
+                },
+              ),
+              ListTile(
+                dense: true,
+                title: Text(
+                  'Terms & Conditions',
                   style: TextStyle(
                       color: Color(0xFF8F8F8F),
                       fontWeight: FontWeight.w600,
@@ -224,8 +251,40 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                 ),
                 onTap: () {},
               ),
+              ListTile(
+                dense: true,
+                title: Text(
+                  'Refund/Cancellation Policy',
+                  style: TextStyle(
+                      color: Color(0xFF8F8F8F),
+                      fontWeight: FontWeight.w600,
+                      fontSize: 18),
+                ),
+                leading: Icon(
+                  Icons.cancel,
+                  color: Color(0xFF408AEB),
+                ),
+                onTap: () {
+                },
+              ),
+              ListTile(
+                dense: true,
+                title: Text(
+                  'Privacy Policy',
+                  style: TextStyle(
+                      color: Color(0xFF8F8F8F),
+                      fontWeight: FontWeight.w600,
+                      fontSize: 18),
+                ),
+                leading: Icon(
+                  Icons.library_books,
+                  color: Color(0xFF408AEB),
+                ),
+                onTap: () {
+                },
+              ),
               Padding(
-                padding: EdgeInsets.only(top: 100),
+                padding: EdgeInsets.only(top: 30),
                 child: ListTile(
                   title: Text(
                     'Logout',

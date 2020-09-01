@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:healthapp/stores/login_store.dart';
 import 'package:healthapp/screens/login_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:healthapp/authentication/user.dart' as globals;
 
 SharedPreferences prefs;
 
@@ -27,6 +28,25 @@ class _SplashPageState extends State<SplashPage> {
         .isAlreadyAuthenticated()
         .then((result) {
       if (result) {
+        globals.user.email = prefs.getString('email');
+         globals.user.photo = prefs.getString('photo');
+        globals.user.name = prefs.getString('name');
+  //       //TODO : also take the phone number
+  //         globals.user.marital = prefs.getString('marital');
+  //    globals.user.address =prefs.getString('address');
+  //    globals.user.gender = prefs.getString('gender');
+  //    globals.user.dob = prefs.getString('dob');
+  //   globals.user.blood =prefs.getString('blood');
+  // globals.user.weight = prefs.getString('weight');
+  //    globals.user.height = prefs.getString('height');
+        globals.user.id = prefs.getString('id');
+     
+
+     //TODO: also add the reason of visting
+
+        print('EMAIL:${globals.user.email}');
+       print(globals.user.photo);
+       print(globals.user.name);
         Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(
                 builder: (_) =>

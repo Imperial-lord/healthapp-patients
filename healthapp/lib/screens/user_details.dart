@@ -5,16 +5,37 @@ import 'package:healthapp/screens/home_screen.dart';
 import 'package:healthapp/authentication/user.dart' as globals;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:healthapp/screens/mobile_auth_screens/mobile_login_page.dart';
+import 'package:healthapp/screens/user_profile.dart';
+import 'package:healthapp/utils/settings.dart';
 import 'package:healthapp/widgets/app_bar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:healthapp/screens/upload_photo.dart';
+
+SharedPreferences prefs;
+
+List<Color> _textColor = [
+  Color(0xFF8F8F8F),
+  Color(0xFF8F8F8F),
+  Color(0xFF8F8F8F),
+];
+List<Color> _bodyColor = [
+  Color(0xFFFFFFFF),
+  Color(0xFFFFFFFF),
+  Color(0xFFFFFFFF),
+];
+List<String> _category = ['Male', 'Female', 'Other'];
+DateTime selectedDate = DateTime.now();
+String dropdownValue = 'O+';
 
 String name;
 String email;
+String photo;
 String gender;
 String address;
-int age;
+
 int phone;
-String dob;
-String blood;
+String dob='${selectedDate.toLocal()}'.split(' ')[0];
+String blood = 'O+';
 int height;
 int weight;
 String marital;
@@ -100,19 +121,7 @@ String validateGender(String value) {
   }
 }
 
-List<Color> _textColor = [
-  Color(0xFF8F8F8F),
-  Color(0xFF8F8F8F),
-  Color(0xFF8F8F8F),
-];
-List<Color> _bodyColor = [
-  Color(0xFFFFFFFF),
-  Color(0xFFFFFFFF),
-  Color(0xFFFFFFFF),
-];
-List<String> _category = ['Male', 'Female', 'Other'];
-DateTime selectedDate = DateTime.now();
-String dropdownValue = 'O+';
+
 
 // Widget for getting , validating and storing User Address
 class UserForm extends StatefulWidget {
@@ -131,7 +140,7 @@ class _UserFormState extends State<UserForm> {
   TextStyle textStyle1 = TextStyle(
       color: Color(0xFF8F8F8F), fontSize: 15, fontWeight: FontWeight.w600);
   TextStyle textStyle2 = TextStyle(
-      color: Color(0xFF408AEB), fontSize: 15, fontWeight: FontWeight.w600);
+      color: Color(0xFF606060), fontSize: 15, fontWeight: FontWeight.w600);
   InputDecoration inputDecoration = InputDecoration(
     filled: true,
     fillColor: Colors.white,
@@ -261,13 +270,13 @@ class _UserFormState extends State<UserForm> {
               isExpanded: true,
               underline: SizedBox(),
               style: TextStyle(
-                  color: Color(0xFF408AEB),
+                  color: Color(0xFF606060),
                   fontSize: 18,
                   fontWeight: FontWeight.w500),
               onChanged: (String newValue) {
                 setState(() {
                   dropdownValue = newValue;
-                  blood=dropdownValue;
+                  blood = dropdownValue;
                 });
               },
               items: <String>['O+', 'O-', 'AB+', 'AB-', 'A+', 'A-', 'B+', 'B-']
@@ -494,7 +503,7 @@ class _UserFormState extends State<UserForm> {
           children: [
             (selectedDate == null)
                 ? _getText('yyyy-mm-dd', 15, Color(0xFF8F8F8F))
-                : _getText('${selectedDate.toLocal()}'.split(' ')[0], 15,
+                : _getText(dateTimeConverter('${selectedDate.toLocal()}'.split(' ')[0]), 15,
                     Color(0xFF408AEB)),
             Spacer(),
             Icon(Icons.calendar_today,
@@ -602,12 +611,12 @@ class _UserFormState extends State<UserForm> {
                           print(height);
                           print(weight);
                           print(marital);
-
+                          prefs = await SharedPreferences.getInstance();
                           final doc = await Firestore.instance
                               .collection('user_details')
                               .where('email', isEqualTo: email)
                               .getDocuments();
-                          if (doc.documents.length == 0) {
+                          if (true) {
                             await globals.uploadUserDetails(
                               name: name,
                               email: email,
@@ -619,11 +628,21 @@ class _UserFormState extends State<UserForm> {
                               weight: weight,
                               marital: marital,
                             );
+                            await prefs.setString('gender', gender);
+                            await prefs.setString('dob', dob);
+                            await prefs.setString('gender', gender);
+                            await prefs.setString('dob', dob);
+                            await prefs.setString('blood', blood);
+                            await prefs.setString('height', height.toString());
+                            await prefs.setString('weight', weight.toString());
+                            await prefs.setString('marital', marital);
+                            await prefs.setString('address', address);
                           }
+                          // Navigator.pushNamed(context, UploadPhoto.id);
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => HomeScreen(
+                                  builder: (context) => UploadPhoto(
                                       currentUserId: widget.currentUserId)));
                         },
                         shape: RoundedRectangleBorder(

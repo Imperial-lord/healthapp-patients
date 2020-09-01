@@ -2,13 +2,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:healthapp/screens/book_appointments/doctor_details.dart';
 import 'package:healthapp/widgets/app_bar.dart';
-import 'package:healthapp/authentication/user.dart';
+import 'package:healthapp/authentication/user.dart' as globals;
 
 const List<String> doc_names = ['Dr. Amit Goel', 'Dr Sonali Gupta'];
 const List<String> doc_images = ['doc1', 'doc2'];
-const List<String> doc_fields = ['Oncologist', 'Gynecologist'];
+const List<String> doc_fields = ['Endocrinologist', 'Gynecologist'];
 const List<String> doc_exp = ['4Y Exp', '3Y Exp'];
-const List<String> doc_costs = ['Rs 200', 'Rs 300'];
+const List<String> doc_costs = ['Rs 400', 'Rs 300'];
 
 class DoctorsList extends StatefulWidget {
   @override
@@ -31,7 +31,7 @@ class _DoctorsListState extends State<DoctorsList> {
           child: SingleChildScrollView(
             child: Column(
               children: <Widget>[
-                for (var i = 0; i < 10; i++)
+                for (var i = 0; i < 1; i++)
                   _doctorTile(
                       doc_names[i % 2],
                       'assets/icons/' + doc_images[i % 2] + '.png',
@@ -53,9 +53,12 @@ class _DoctorsListState extends State<DoctorsList> {
       padding: const EdgeInsets.only(bottom: 20),
       child: RaisedButton(
         onPressed: () async {
-          print(name);
-       
-          Navigator.pushNamed(context, DoctorDetails.id,arguments: {
+          print('name');
+       //   globals.getPatient();
+       //   globals.getAllBookings();
+       //   globals.getPatientofGivenBookingId();
+
+          Navigator.pushNamed(context, DoctorDetails.id, arguments: {
             'name': name,
             'expYears': expYears,
             'fields': fields,
