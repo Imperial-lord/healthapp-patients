@@ -2,13 +2,14 @@ library globals;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
 import 'package:healthapp/authentication/user.dart' as globals;
 
 class User {
   int cost;
   String email;
   String paymentId;
-  int phone;
+  String phone;
   String photo;
   String name;
   String gender, dob, blood, marital, address;
@@ -32,6 +33,7 @@ Future<String> uploadUserDetails({
   int height,
   int weight,
   String marital,
+  String phone,
 }) async {
   print('email:${globals.user.email}');
   final _firestore = Firestore.instance;
@@ -51,6 +53,26 @@ Future<String> uploadUserDetails({
       'height': height,
       'weight': weight,
       'marital': marital,
+      'phone':phone,
+    },
+  );
+  return _id;
+}
+
+Future<String> uploadReviews({
+  int rate,
+  String comment,
+}) async {
+  // print('email:${globals.user.email}');
+  final _firestore = Firestore.instance;
+  final _id = _firestore.collection('review').document().documentID;
+  // print('userdetailsId:$_id');
+  await Firestore.instance.collection('review').document().setData(
+    {
+      'name': globals.user.name,
+      'photo': globals.user.photo,
+      'rate': rate,
+      'comment': comment,
     },
   );
   return _id;
@@ -70,6 +92,7 @@ Future<String> uploadBookingDetails({
   String id,
   String name,
   String photo,
+  String phone,
 }) async {
   print('email:${globals.user.email}');
   final _firestore = Firestore.instance;
@@ -94,6 +117,7 @@ Future<String> uploadBookingDetails({
     'id': id,
     'photo': photo,
     'name': name,
+    'phone':phone,
   }, merge: true).then((_) {
     print("payment id added");
   });
@@ -118,7 +142,31 @@ void getPatientBooking() async {
       .document(globals.user.id)
       .get()
       .then((value) {
-        print( value.data);
+    print(value.data);
+  });
+}
+
+void getDoctorDetails() async {
+  final _firestore = Firestore.instance;
+  final _id = _firestore.collection('doctor').document().documentID;
+  print('id${_id}');
+  Firestore.instance
+      .collection("doctor")
+      .document("5lXYnBBrxXvgU0dpZGId")
+      .get()
+      .then((value) {
+    print(value.data['courses']);
+  });
+}
+
+void getDoctorTimings() async {
+  Firestore.instance
+      .collection("doctor")
+      .document("dramitgoelhyd@gmail.com")
+      .get()
+      .then((value) {
+    //returns an array of timings
+    print(value.data['monday']);
   });
 }
 
@@ -134,14 +182,53 @@ void getAllPatientDetail() {
   });
 }
 
-void getPatientofGivenBookingId(String paymentId) {
-  Firestore.instance
-      .collection("booking_details")
-      .where("paymentId", isEqualTo: paymentId)
-      .getDocuments()
-      .then((value) {
+void getPatientofGivenBookingId() {
+  Firestore.instance.collection("messages").getDocuments().then((value) {
     value.documents.forEach((result) {
       print(result.data);
+    });
+  });
+}
+
+void getPrescriptionByPatient() {
+  Firestore.instance
+      .collection("messages")
+      .getDocuments()
+      .then((querySnapshot) {
+    querySnapshot.documents.forEach((result) {
+      Firestore.instance
+          .collection("messages")
+          .document(result.documentID)
+          .collection(result.documentID)
+          .getDocuments()
+          .then((querySnapshot) {
+        querySnapshot.documents.forEach((result) {
+          print('presCRIPTION');
+          print(result.data);
+        });
+      });
+    });
+  });
+}
+
+void getPrescriptionByDoctor() {
+  Firestore.instance
+      .collection("messages")
+      .getDocuments()
+      .then((querySnapshot) {
+    querySnapshot.documents.forEach((result) {
+      Firestore.instance
+          .collection("messages")
+          .document("2GVoVBWHxtWdyfTDjpXN3RYzc1j1-w3xYinWd7OhOPF0GbC6lumihYAD2")
+          .collection(
+              "2GVoVBWHxtWdyfTDjpXN3RYzc1j1-w3xYinWd7OhOPF0GbC6lumihYAD2")
+          .where('type', isEqualTo: 1)
+          .getDocuments()
+          .then((querySnapshot) {
+        querySnapshot.documents.forEach((result) {
+          print(result.data['content']);
+        });
+      });
     });
   });
 }

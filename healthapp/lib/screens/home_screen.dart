@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:healthapp/screens/appointments/upcoming_page.dart';
 import 'package:healthapp/screens/blogs/blogs_page.dart';
@@ -18,36 +20,37 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  
   int selectedIndex = 0;
 
   List<Text> headingOptions = [
     Text(
       'Home',
-      style: GoogleFonts.varelaRound(
-        fontWeight: FontWeight.w700,
-        color: Color(0xFFFFFFFF),
+      style: GoogleFonts.nunito(
+        fontSize: 18,
+        fontWeight: FontWeight.bold,
+        color: Color(0xFF262626),
       ),
     ),
     Text(
       'My Bookings',
-      style: GoogleFonts.varelaRound(
-        fontWeight: FontWeight.w700,
-        color: Color(0xFFFFFFFF),
+      style: GoogleFonts.nunito(
+        fontSize: 18,
+        fontWeight: FontWeight.bold,
+        color: Color(0xFF262626),
       ),
     ),
     Text(
       'All Blogs',
-      style: GoogleFonts.varelaRound(
-        fontWeight: FontWeight.w700,
-        color: Color(0xFFFFFFFF),
+      style: GoogleFonts.nunito(
+        fontSize: 18,
+        fontWeight: FontWeight.bold,
+        color: Color(0xFF262626),
       ),
     ),
   ];
 
   @override
   Widget build(BuildContext context) {
-   // globals.getPatient();
     List<Widget> widgetOptions = [
       HomePage(),
       ChatScreen(currentUserId: widget.currentUserId),
@@ -59,29 +62,49 @@ class _HomeScreenState extends State<HomeScreen> {
           preferredSize:
               Size.fromHeight(MediaQuery.of(context).size.height * 0.08),
           child: AppBar(
+            iconTheme: new IconThemeData(color: Color(0xFF408AEB)),
             title: headingOptions[selectedIndex],
-            backgroundColor: Colors.blue[700],
+            backgroundColor: Color(0xFFF8F8F8),
+            elevation: 0,
+            leading: Builder(
+              builder: (context) => IconButton(
+                icon: Icon(Icons.menu),
+                onPressed: () => Scaffold.of(context).openDrawer(),
+              ),
+            ),
           ),
         ),
         drawer: DrawerWidget(),
         body: widgetOptions[selectedIndex],
         bottomNavigationBar: BottomNavigationBar(
-          selectedItemColor: Colors.blue[700],
+          selectedItemColor: Color(0xFF408AEB),
+          backgroundColor: Colors.white,
+          showSelectedLabels: false,
+          showUnselectedLabels: false,
           items: [
             BottomNavigationBarItem(
-              icon: Icon(Icons.home),
+              icon: Icon(
+                Icons.home,
+                size: 25,
+              ),
               title: Text(
                 'Home',
               ),
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.work),
+              icon: Icon(
+                Icons.work,
+                size: 25,
+              ),
               title: Text(
                 'Appointments',
               ),
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.chat_bubble),
+              icon: Icon(
+                Icons.chat_bubble,
+                size: 25,
+              ),
               title: Text(
                 'Blogs',
               ),
@@ -89,6 +112,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
           currentIndex: selectedIndex,
           onTap: (int i) {
+            globals.getPatientofGivenBookingId();
             setState(() {
               selectedIndex = i;
             });

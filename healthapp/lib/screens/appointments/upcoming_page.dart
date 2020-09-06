@@ -4,6 +4,9 @@ import 'package:healthapp/authentication/google_login.dart';
 import 'package:healthapp/authentication/user.dart' as globals;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:healthapp/screens/user_profile.dart';
+import 'package:healthapp/screens/appointments/doctor_desc.dart';
+import 'package:healthapp/screens/book_appointments/appointment_details.dart';
 import 'package:healthapp/utils/settings.dart';
 import 'package:healthapp/widgets/loading.dart';
 
@@ -19,36 +22,35 @@ class _UpcomingPageState extends State<UpcomingPage> {
   Widget build(BuildContext context) {
     return Stack(
       children: <Widget>[
-        Container(
-          height: 90,
-          color: Color(0xFFF8F8F8),
-          child: StreamBuilder(
-            stream:
-                Firestore.instance.collection('booking_details').snapshots(),
-            builder: (context, snapshot) {
-              print(snapshot);
-              if (!snapshot.hasData) {
-                return Center(
-                  child: CircularProgressIndicator(
-                    valueColor:
-                        AlwaysStoppedAnimation<Color>(Color(0xfff5a623)),
-                  ),
-                );
-              } else {
-                return Column(
-                  children: [
-                    Expanded(
-                      child: ListView.builder(
-                        itemBuilder: (context, index) =>
-                            buildItem(context, snapshot.data.documents[index]),
-                        itemCount: snapshot.data.documents.length,
-                        physics: new NeverScrollableScrollPhysics(),
-                      ),
+        InkWell(
+          onTap: () {
+            Navigator.pushNamed(context, DoctorDesc.id);
+          },
+          child: Ink(
+            height: 90,
+            color: Color(0xFFF8F8F8),
+            child: StreamBuilder(
+              stream:
+                  Firestore.instance.collection('booking_details').snapshots(),
+              builder: (context, snapshot) {
+                print(snapshot);
+                if (!snapshot.hasData) {
+                  return Center(
+                    child: CircularProgressIndicator(
+                      valueColor:
+                          AlwaysStoppedAnimation<Color>(Color(0xfff5a623)),
                     ),
-                  ],
-                );
-              }
-            },
+                  );
+                } else {
+                  return ListView.builder(
+                    itemBuilder: (context, index) =>
+                        buildItem(context, snapshot.data.documents[index]),
+                    itemCount: snapshot.data.documents.length,
+                    physics: new NeverScrollableScrollPhysics(),
+                  );
+                }
+              },
+            ),
           ),
         ),
         // Loading
@@ -59,17 +61,10 @@ class _UpcomingPageState extends State<UpcomingPage> {
 
   Widget buildItem(BuildContext context, DocumentSnapshot document) {
     if (document.data['id'] != globals.user.id) {
-      if (document.data.length == 0)
-        return Container(
-          alignment: Alignment.center,
-          child: Text(
-            'You have no upcoming appointments!',
-          ),
-        );
+      if (document.data.length != 0)
+        return Container();
       else
-        return Container(
-          height: 0,
-        );
+        return Container();
     } else {
       print(document.data['id']);
       String time = document.data['visitDuration'];

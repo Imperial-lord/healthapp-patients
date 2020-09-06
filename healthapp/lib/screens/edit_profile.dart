@@ -26,7 +26,7 @@ List<Color> _bodyColor = [
 ];
 List<String> _category = ['Male', 'Female', 'Other'];
 DateTime selectedDate;
-String dropdownValue;
+String dropdownValue = 'O+';
 
 class Profile extends StatelessWidget {
   static const id = "profile";
@@ -35,7 +35,6 @@ class Profile extends StatelessWidget {
 //Profile({this.user});
   @override
   Widget build(BuildContext context) {
-   
     return Scaffold(
       appBar: _appBar(context),
       body: SettingsScreen(),
@@ -63,24 +62,24 @@ class Profile extends StatelessWidget {
             Icons.arrow_back_ios,
             color: Colors.blue[700],
           )),
-      actions: [
-        Container(
-          alignment: Alignment.center,
-          padding: EdgeInsets.only(right: 20),
-          child: GestureDetector(
-            onTap: () {
-              Navigator.pushNamed(context, UserProfile.id);
-            },
-            child: Text(
-              'SAVE',
-              style: GoogleFonts.nunito(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w800,
-                  color: Color(0xFF408AEB)),
-            ),
-          ),
-        ),
-      ],
+      // actions: [
+      //   Container(
+      //     alignment: Alignment.center,
+      //     padding: EdgeInsets.only(right: 20),
+      //     child: GestureDetector(
+      //       onTap: () {
+      //         Navigator.pushNamed(context, UserProfile.id);
+      //       },
+      //       child: Text(
+      //         'SAVE',
+      //         style: GoogleFonts.nunito(
+      //             fontSize: 15,
+      //             fontWeight: FontWeight.w800,
+      //             color: Color(0xFF408AEB)),
+      //       ),
+      //     ),
+      //   ),
+      // ],
     );
   }
 }
@@ -100,6 +99,7 @@ class SettingsScreenState extends State<SettingsScreen> {
   TextEditingController controllerweight;
   TextEditingController controllermarital;
   TextEditingController controlleraddress;
+  TextEditingController controllerphone;
 
   SharedPreferences prefs;
 
@@ -111,11 +111,13 @@ class SettingsScreenState extends State<SettingsScreen> {
   String gender = '';
 
   int age;
-  int phone;
+
+  //int phone;
   String dob = '';
   String blood = '';
   String height;
   String weight;
+  String phone;
   String marital = '';
   String address = '';
 
@@ -127,6 +129,7 @@ class SettingsScreenState extends State<SettingsScreen> {
   final FocusNode focusNodeGender = FocusNode();
 
   final FocusNode focusNodeDob = FocusNode();
+  final FocusNode focusNodePhone = FocusNode();
 
   final FocusNode focusNodeBlood = FocusNode();
   final FocusNode focusNodeHeight = FocusNode();
@@ -150,13 +153,14 @@ class SettingsScreenState extends State<SettingsScreen> {
     dob = prefs.getString('dob') ?? '';
     blood = prefs.getString('blood') ?? '';
     height = prefs.getString('height') ?? '';
-
+    phone = prefs.getString('phone') ?? '';
     weight = prefs.getString('weight') ?? '';
     marital = prefs.getString('marital') ?? '';
     address = prefs.getString('address') ?? '';
 
     controllerName = TextEditingController(text: name);
     controllerEmail = TextEditingController(text: email);
+    controllerphone = TextEditingController(text: phone);
 
     controllergender = TextEditingController(text: gender);
     controllerdob = TextEditingController(text: dob);
@@ -228,12 +232,9 @@ class SettingsScreenState extends State<SettingsScreen> {
               .collection('user_details')
               .document(globals.user.id)
               .updateData({
-            //TODO: chnage this photo with the one that user will uplaod
             'photo': photo,
             'name': name,
             'email': email,
-            //TODO: chnage this photo with the one that user will uplaod
-            //'photo': globals.user.photo,
             'gender': gender,
             'dob': dob,
             'blood': blood,
@@ -241,6 +242,7 @@ class SettingsScreenState extends State<SettingsScreen> {
             'weight': weight,
             'marital': marital,
             'address': address,
+            'phone': phone,
           }).then((data) async {
             await prefs.setString('photo', photo);
             setState(() {
@@ -283,7 +285,7 @@ class SettingsScreenState extends State<SettingsScreen> {
     focusNodeWeight.unfocus();
     focusNodeMarital.unfocus();
     focusNodeAddress.unfocus();
-    // focusNodeEmail.unfocus();
+    focusNodePhone.unfocus();
 
     setState(() {
       isLoading = true;
@@ -305,6 +307,7 @@ class SettingsScreenState extends State<SettingsScreen> {
       'weight': weight,
       'marital': marital,
       'address': address,
+      'phone': phone,
     }).then((data) async {
       await prefs.setString('name', name);
       await prefs.setString('email', email);
@@ -315,12 +318,14 @@ class SettingsScreenState extends State<SettingsScreen> {
       await prefs.setString('dob', dob);
       await prefs.setString('blood', blood);
       await prefs.setString('gender', gender);
+      await prefs.setString('phone', phone);
 
       setState(() {
         isLoading = false;
       });
 
       Fluttertoast.showToast(msg: "Successfully updated");
+      Navigator.pushNamed(context, UserProfile.id);
       print(email);
     }).catchError((err) {
       setState(() {
@@ -397,6 +402,12 @@ class SettingsScreenState extends State<SettingsScreen> {
                         '${selectedDate.toLocal()}'.split(' ')[0]),
                     15,
                     Color(0xFF606060)),
+            Spacer(),
+            Icon(Icons.calendar_today,
+                color: (selectedDate == null)
+                    ? Color(0xFF8F8F8F)
+                    : Color(0xFF408AEB),
+                size: 20),
           ],
         ),
       ),
@@ -475,7 +486,9 @@ class SettingsScreenState extends State<SettingsScreen> {
                                       height: 90.0,
                                       padding: EdgeInsets.all(20.0),
                                     ),
-                                    imageUrl: photo,
+                                    imageUrl:
+                                        photo.substring(0, photo.length - 5) +
+                                            's400-c',
                                     width: 130.0,
                                     height: 130.0,
                                     fit: BoxFit.cover,
@@ -558,6 +571,22 @@ class SettingsScreenState extends State<SettingsScreen> {
                     },
                     focusNode: focusNodeEmail,
                   ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    child: Text('Mobile Number', style: textStyle1),
+                  ),
+                  TextField(
+                    decoration: inputDecoration,
+                    cursorColor: Color(0xFF8F8F8F),
+                    cursorRadius: Radius.circular(10),
+                    cursorWidth: 0.5,
+                    style: textStyle2,
+                    controller: controllerphone,
+                    onChanged: (value) {
+                      phone = value;
+                    },
+                    focusNode: focusNodePhone,
+                  ),
                 ],
               ),
               Column(
@@ -603,7 +632,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(7)),
                           child: DropdownButton<String>(
-                            value: blood,
+                            value: dropdownValue,
                             icon: Icon(Icons.arrow_drop_down),
                             iconSize: 24,
                             isExpanded: true,
@@ -686,6 +715,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                     cursorRadius: Radius.circular(10),
                     cursorWidth: 0.5,
                     style: textStyle2,
+                    keyboardType: TextInputType.number,
                     controller: controllerheight,
                     onChanged: (value) {
                       height = value;
@@ -723,6 +753,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                           fontWeight: FontWeight.w600),
                     ),
                     cursorColor: Color(0xFF8F8F8F),
+                    keyboardType: TextInputType.number,
                     cursorRadius: Radius.circular(10),
                     cursorWidth: 0.5,
                     style: textStyle2,
@@ -744,6 +775,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                     cursorRadius: Radius.circular(10),
                     cursorWidth: 0.5,
                     style: textStyle2,
+                    // keyboardType: TextInputType.number,
                     controller: controlleraddress,
                     onChanged: (value) {
                       address = value;
@@ -787,16 +819,17 @@ class SettingsScreenState extends State<SettingsScreen> {
                         onPressed: handleUpdateData,
                         elevation: 10,
                         child: Text(
-                          'Update',
+                          'Update and Save',
                           style: TextStyle(
                               color: Colors.white,
-                              fontSize: 18,
+                              fontSize: 16,
                               fontWeight: FontWeight.bold),
                         ),
                         color: Color(0xFF408AEB),
                         padding: EdgeInsets.all(20),
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(7)),
+                          borderRadius: BorderRadius.circular(7),
+                        ),
                       ),
                     ),
                   ],
